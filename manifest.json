@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "speedtest-map",
+  "name": "Speedtest",
+  "version": "1.0.0",
+  "author": "Zihuai Lin",
+  "description": "Ookla live speed testing with Omarchy's original dials, provider and server details",
+  "kinds": [
+    "panel"
+  ],
+  "entryPoints": {
+    "panel": "Panel.qml"
+  },
+  "omarchy": {
+    "clonedFrom": "omarchy.speedtest"
+  },
+  "license": "GPL-3.0-only"
+}
