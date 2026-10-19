@@ -77,7 +77,8 @@ Item {
     function eventReceived(event) {
         if (!opened || !running) return;
         state = Model.reduce(state, event);
-        if (state.error) { fail(state.error); return; }
+        // Ookla may log a connection error, select another server, and still
+        // return a valid result. Decide failure only after the CLI exits.
     }
     function parseStream(text, isError, finalChunk) {
         if (!opened || !running) return;
@@ -101,7 +102,7 @@ Item {
         if (exitCode !== 0 || !state.result) {
             var detail = stderrPlain.trim();
             if (/license|gdpr|eula/i.test(detail)) detail = "Open a terminal and run Ookla speedtest once to review its terms, then try again.";
-            fail(detail || "Speedtest exited without a complete result.");
+            fail(detail || state.error || "Speedtest exited without a complete result.");
         } else { running = false; deadline.stop(); }
     }
     Process {
@@ -149,7 +150,7 @@ Item {
             }
         }
     }
-    Timer { id:deadline; interval:120000; onTriggered:root.fail("Speedtest timed out after 120 seconds.") }
+    Timer { id:deadline; interval:120000; onTriggered:root.fail(root.state.error || root.stderrPlain.trim() || "Speedtest timed out after 120 seconds.") }
     Timer {
         id:demoTimer; interval:400; repeat:true
         onTriggered: {

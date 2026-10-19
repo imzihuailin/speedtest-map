@@ -22,6 +22,9 @@ scenario=os.environ['FIXTURE_SCENARIO']
 if scenario=='license':
  print('EULA license acceptance required',file=sys.stderr);sys.exit(1)
 if scenario=='missing': sys.exit(0)
+if scenario=='recover':
+ print(json.dumps({'type':'log','level':'error','message':'Error: [0] Timeout occurred in connect.'}),flush=True)
+ print('Error: [0] Timeout occurred in connect.',file=sys.stderr,flush=True)
 events=[{'type':'testStart','isp':'Fixture Transit','interface':{'externalIp':'203.0.113.10'},'server':{'id':42,'name':'Fixture Server','location':'Example City','country':'Example Country','ip':'198.51.100.20','lat':47.6,'lon':-122.3}}, {'type':'download','download':{'bandwidth':12500000}},{'type':'upload','upload':{'bandwidth':6250000}},{'type':'result','download':{'bandwidth':12500000},'upload':{'bandwidth':6250000}}]
 if scenario=='cancel': events=events[:2]
 for i,event in enumerate(events):
@@ -48,9 +51,10 @@ def main():
         cli.chmod(0o755)
         (config / "speedtest-map").mkdir(parents=True)
         (config / "speedtest-map/config.json").write_text(json.dumps({"cliPath":str(cli),"reducedMotion":True}))
-        for scenario in ["success", "license", "missing", "cancel"]:
+        for scenario in ["success", "recover", "license", "missing", "cancel"]:
             condition = {
                 "success": 'panel.state.result && panel.state.download===100 && panel.state.upload===50 && !panel.running && panel.error===""',
+                "recover": 'panel.state.result && panel.state.download===100 && panel.state.upload===50 && !panel.running && panel.error===""',
                 "license": '!panel.running && panel.error.indexOf("terms")>=0',
                 "missing": '!panel.running && panel.error.indexOf("complete result")>=0',
                 "cancel": '!panel.opened && !panel.running',
