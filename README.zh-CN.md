@@ -37,27 +37,6 @@ python install.py --uninstall
 ```json
 {"cliPath":"speedtest","reducedMotion":false}
 ```
-
-## 排查连接失败
-
-如果关闭 FlClash TUN 后测速失败，请在同一个终端分别采集两份报告。先保持 TUN 开启，运行：
-
-```bash
-python tools/diagnose.py --label tun-on --output /tmp/speedtest-tun-on.json
-```
-
-手动关闭 TUN，再运行：
-
-```bash
-python tools/diagnose.py --label tun-off --output /tmp/speedtest-tun-off.json
-```
-
-重新开启 TUN 恢复连接后，比较或提供这两份 JSON 文件。重点查看 `test.phases`、`test.errors`、退出码、代理环境变量是否存在、默认路由和 DNS 状态。测速失败或报告了可恢复错误时，`serverSelection` 会提供额外的查询日志。这些记录用于排查，不会自动认定根因。终端的环境变量可能与桌面面板继承的环境不同。
-
-工具使用已有配置中的 CLI，会执行一次真实上下行测速（最多 120 秒），产生网络流量；失败后查询服务器列表并收集详细日志（最多 30 秒）。本地检查各有独立的短超时。Ctrl+C 会停止当前子进程并保存部分报告。缺少系统命令或权限受限会记录在报告中，不影响后续检查。工具不会修改代理、路由、DNS 或桌面配置，也不会自动接受 Ookla 条款；尚未确认条款时，请先在终端手动运行官方 CLI。
-
-报告不保存原始测速结果，会隐藏 IP、MAC、URL、代理地址及凭据，保留网卡名称和诊断信息；分享前请检查内容。报告保存成功返回退出码 0，即使测速失败也是如此；中断返回 130，保存失败返回 1。`/tmp` 中的文件可能被系统清理，需要保留时请另行复制。
-
 ## 开发
 
 ```bash
